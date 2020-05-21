@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -26,35 +26,45 @@ public class DecoderServiceImpl implements DecoderService {
         Preconditions.checkNotNull(image, "Image cannot be null");
         Preconditions.checkNotNull(image.getBytes(), "Image bytes cannot be null");
 
-        List<String> binaryList = Arrays
-                .stream(image.getBytes())
-                .map(Arrays::toString)
-                .map(str -> str
-                        .replaceAll(",", "")
-                        .replaceAll("\\[", "")
-                        .replaceAll("\\]", "")
-                        .replaceAll("\\s", ""))
-                .collect(Collectors.toList());
+        byte[][] imageBytes = image.getBytes();
 
-        String flatBinary = binaryList.stream().collect(Collectors.joining());
+        int N = imageBytes.length;
+        int M;
 
-        Pattern pattern = Pattern.compile("0+|1+");
-        Matcher matcher = pattern.matcher(flatBinary);
-
-        int N = binaryList.size();
-
-        int M = 0;
-        if(!binaryList.isEmpty()){
-            M = binaryList.get(0).length();
+        if(imageBytes.length > 0){
+            M = imageBytes[0].length;
         } else {
             logger.error("Not a valid project binary file!");
             throw new DecoderException("Not a valid project binary file!");
         }
 
+        List<Integer> integerList = new ArrayList<>();
         StringBuilder output = new StringBuilder(N+""+M);
 
-        while (matcher.find()) {
-            output.append(matcher.group(0).length());
+        for (byte[] b : imageBytes) {
+            for (byte b1 : b) {
+                integerList.add((int) b1);
+            }
+        }
+
+        int previous = 0;
+        AtomicInteger count = new AtomicInteger();
+        Iterator<Integer> itr = integerList.iterator();
+        while (itr.hasNext()) {
+            int b1 = itr.next();
+
+            if(previous == b1){
+                count.incrementAndGet();
+            }else{
+                previous = b1;
+                output.append(count.get());
+                count.set(0);
+                count.incrementAndGet();
+            }
+
+            if(!itr.hasNext()){
+                output.append(count.get());
+            }
         }
 
         logger.info("Image successfully decoded!");
@@ -66,15 +76,18 @@ public class DecoderServiceImpl implements DecoderService {
         Preconditions.checkNotNull(image.getHeader(), "Image header cannot be null");
 
         String input = image.getHeader();
-        String[] charSplit = input.substring(2).split("");
+
+        int[] numbersIntArray = Stream.of(input.substring(2).split("")).mapToInt(Integer::parseInt).toArray();
+
         int secondDimension = Integer.parseInt(input.substring(1,2));
 
         byte[][] outputImage = new byte[Integer.parseInt(input.substring(0,1))][secondDimension];
 
-        String filler = new String();
-        for (int i = 0; i < charSplit.length; i++) {
+        String filler = "";
 
-            int split = Integer.parseInt(charSplit[i]);
+        for (int i = 0; i < numbersIntArray.length; i++) {
+
+            int split = numbersIntArray[i];
             if(i % 2 == 0){
                 //Adds zeros
                 filler = Strings.padEnd(filler, filler.length()+split, '0');
@@ -86,17 +99,17 @@ public class DecoderServiceImpl implements DecoderService {
 
         }
 
-        String[] multi = filler.split("");
+        int[] multi = Stream.of(filler.split("")).mapToInt(Integer::parseInt).toArray();
 
         byte[] dimension = new byte[secondDimension];
         int leftCounter = 0;
         int rightCounter = 0;
-        for (int i = 0; i < multi.length; i++){
+        for (int value : multi) {
 
-            dimension[rightCounter] = (byte) Integer.parseInt(multi[i]);
+            dimension[rightCounter] = (byte) value;
             rightCounter++;
 
-            if(rightCounter != 0 & rightCounter % 4 == 0){
+            if (rightCounter != 0 & rightCounter % 4 == 0) {
                 outputImage[leftCounter] = dimension;
                 dimension = new byte[secondDimension];
                 leftCounter++;

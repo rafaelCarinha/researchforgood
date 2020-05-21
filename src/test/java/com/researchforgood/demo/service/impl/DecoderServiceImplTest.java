@@ -17,7 +17,10 @@ public class DecoderServiceImplTest {
     @Autowired
     DecoderService decoderService;
 
-    private byte[][] imageBytes = new byte[][] {{0,0,0,1}, {1,1,1,1}, {1,0,0,1}};
+    private static final byte[][] imageBytes = new byte[][] {{0,0,0,1}, {1,1,1,1}, {1,0,0,1}};
+    private static final byte[][] imageBytes2 = new byte[][] {{0,0,0,1}, {1,1,1,1}, {1,0,0,0}};
+    private static final byte[][] imageBytesOnlyZeros = new byte[][] {{0,0,0,0}, {0,0,0,0}, {0,0,0,0}};
+    private static final byte[][] imageBytesOnlyOnes = new byte[][] {{0,0,0,0}, {0,0,0,0}, {0,0,0,0}};
 
     @Test
     public void decodeImageTest_success() throws Exception{
@@ -26,6 +29,36 @@ public class DecoderServiceImplTest {
         image.setBytes(imageBytes);
 
         Assert.assertEquals("343621", decoderService.decodeImage(image));
+
+    }
+
+    @Test
+    public void decodeImageTest2_success() throws Exception{
+
+        Image image = new Image();
+        image.setBytes(imageBytes2);
+
+        Assert.assertEquals("34363", decoderService.decodeImage(image));
+
+    }
+
+    @Test
+    public void decodeImageOnlyZeros_success() throws Exception{
+
+        Image image = new Image();
+        image.setBytes(imageBytesOnlyZeros);
+
+        Assert.assertEquals("3412", decoderService.decodeImage(image));
+
+    }
+
+    @Test
+    public void decodeImageOnlyOnes_success() throws Exception{
+
+        Image image = new Image();
+        image.setBytes(imageBytesOnlyOnes);
+
+        Assert.assertEquals("3412", decoderService.decodeImage(image));
 
     }
 
