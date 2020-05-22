@@ -22,7 +22,7 @@ public class DecoderServiceImpl implements DecoderService {
 
     Logger logger = LoggerFactory.getLogger(DecoderService.class);
 
-    public String decodeImage(Image image) throws DecoderException {
+    public Image decodeImage(Image image) throws DecoderException {
         Preconditions.checkNotNull(image, "Image cannot be null");
         Preconditions.checkNotNull(image.getBytes(), "Image bytes cannot be null");
 
@@ -39,7 +39,7 @@ public class DecoderServiceImpl implements DecoderService {
         }
 
         List<Integer> integerList = new ArrayList<>();
-        StringBuilder output = new StringBuilder(N+""+M);
+        StringBuilder output = new StringBuilder(N+" "+M+" ");
 
         for (byte[] b : imageBytes) {
             for (byte b1 : b) {
@@ -47,19 +47,24 @@ public class DecoderServiceImpl implements DecoderService {
             }
         }
 
-        int previous = 0;
+        Integer previous = null;
         AtomicInteger count = new AtomicInteger();
         Iterator<Integer> itr = integerList.iterator();
         while (itr.hasNext()) {
             int b1 = itr.next();
 
-            if(previous == b1){
+            if(previous == null) {
+                previous = b1;
                 count.incrementAndGet();
             }else{
-                previous = b1;
-                output.append(count.get());
-                count.set(0);
-                count.incrementAndGet();
+                if(previous == b1){
+                    count.incrementAndGet();
+                }else{
+                    previous = b1;
+                    output.append(count.get()).append(" ");
+                    count.set(0);
+                    count.incrementAndGet();
+                }
             }
 
             if(!itr.hasNext()){
@@ -68,20 +73,27 @@ public class DecoderServiceImpl implements DecoderService {
         }
 
         logger.info("Image successfully decoded!");
-        return output.toString();
+        return Image.builder()
+                .header(output.toString())
+                .bytes(imageBytes)
+                .N(N)
+                .M(M)
+                .build();
     }
 
-    public byte[][] encodeImage(Image image){
+    public Image encodeImage(Image image){
         Preconditions.checkNotNull(image, "Image cannot be null");
         Preconditions.checkNotNull(image.getHeader(), "Image header cannot be null");
 
         String input = image.getHeader();
 
-        int[] numbersIntArray = Stream.of(input.substring(2).split("")).mapToInt(Integer::parseInt).toArray();
+        int[] fullArray = Stream.of(input.split(" ")).mapToInt(Integer::parseInt).toArray();
 
-        int secondDimension = Integer.parseInt(input.substring(1,2));
+        int N = fullArray[0];
+        int M = fullArray[1];
+        int[] numbersIntArray = Stream.of(input.substring((N+" "+M+" ").length()).split(" ")).mapToInt(Integer::parseInt).toArray();
 
-        byte[][] outputImage = new byte[Integer.parseInt(input.substring(0,1))][secondDimension];
+        byte[][] outputImage = new byte[N][M];
 
         String filler = "";
 
@@ -101,7 +113,7 @@ public class DecoderServiceImpl implements DecoderService {
 
         int[] multi = Stream.of(filler.split("")).mapToInt(Integer::parseInt).toArray();
 
-        byte[] dimension = new byte[secondDimension];
+        byte[] dimension = new byte[M];
         int leftCounter = 0;
         int rightCounter = 0;
         for (int value : multi) {
@@ -109,16 +121,22 @@ public class DecoderServiceImpl implements DecoderService {
             dimension[rightCounter] = (byte) value;
             rightCounter++;
 
-            if (rightCounter != 0 & rightCounter % 4 == 0) {
+            if (rightCounter != 0 & rightCounter % M == 0) {
                 outputImage[leftCounter] = dimension;
-                dimension = new byte[secondDimension];
+                dimension = new byte[M];
                 leftCounter++;
                 rightCounter = 0;
             }
         }
 
         logger.info("Image successfully encoded!");
-        return outputImage;
+
+        return Image.builder()
+                .bytes(outputImage)
+                .N(N)
+                .M(M)
+                .header(image.getHeader())
+                .build();
 
     }
 }

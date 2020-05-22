@@ -18,13 +18,13 @@ public class DecoderController {
     }
 
     @PostMapping("/decode")
-    String decode(@RequestBody Image image) throws Exception{
+    Image decode(@RequestBody Image image) throws Exception{
         return decoderService.decodeImage(image);
     }
 
 
     @PostMapping("/encode")
-    byte[][] encode(@RequestBody Image image) {
+    Image encode(@RequestBody Image image) {
         return decoderService.encodeImage(image);
     }
 

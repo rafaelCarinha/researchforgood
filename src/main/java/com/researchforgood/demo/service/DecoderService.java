@@ -5,7 +5,7 @@ import com.researchforgood.demo.exception.DecoderException;
 
 public interface DecoderService {
 
-    String decodeImage(Image image) throws DecoderException;
+    Image decodeImage(Image image) throws DecoderException;
 
-    byte[][] encodeImage(Image  input);
+    Image encodeImage(Image  input);
 }
