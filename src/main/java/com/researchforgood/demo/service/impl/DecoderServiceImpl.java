@@ -20,8 +20,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class DecoderServiceImpl implements DecoderService {
 
-    final Logger logger = LoggerFactory.getLogger(DecoderService.class);
+    final Logger logger = LoggerFactory.getLogger(DecoderServiceImpl.class);
 
+    @Override
     public Image decodeImage(Image image) throws DecoderException {
         Preconditions.checkNotNull(image, "Image cannot be null");
         Preconditions.checkNotNull(image.getBytes(), "Image bytes cannot be null");
@@ -78,6 +79,7 @@ public class DecoderServiceImpl implements DecoderService {
                 .build();
     }
 
+    @Override
     public Image encodeImage(Image image){
         Preconditions.checkNotNull(image, "Image cannot be null");
         Preconditions.checkNotNull(image.getHeader(), "Image header cannot be null");

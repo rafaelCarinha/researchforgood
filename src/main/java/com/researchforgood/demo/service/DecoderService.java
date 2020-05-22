@@ -7,5 +7,5 @@ public interface DecoderService {
 
     Image decodeImage(Image image) throws DecoderException;
 
-    Image encodeImage(Image  input);
+    Image encodeImage(Image image);
 }

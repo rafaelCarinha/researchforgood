@@ -1,8 +1,8 @@
-package com.researchforgood.demo.service.impl;
+package com.researchforgood.demo.service;
 
 import com.researchforgood.demo.Image;
 import com.researchforgood.demo.exception.DecoderException;
-import com.researchforgood.demo.service.DecoderService;
+import com.researchforgood.demo.service.impl.DecoderServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,10 +17,10 @@ import java.io.IOException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DecoderServiceImplTest {
+public class DecoderServiceTest {
 
     @Autowired
-    DecoderService decoderService;
+    DecoderServiceImpl decoderService;
 
     private static final byte[][] imageBytes = new byte[][] {{0,0,0,1}, {1,1,1,1}, {1,0,0,1}};
     private static final byte[][] imageBytes2 = new byte[][] {{0,0,0,1}, {1,1,1,1}, {1,0,0,0}};
