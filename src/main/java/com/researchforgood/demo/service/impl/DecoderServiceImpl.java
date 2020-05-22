@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class DecoderServiceImpl implements DecoderService {
 
-    Logger logger = LoggerFactory.getLogger(DecoderService.class);
+    final Logger logger = LoggerFactory.getLogger(DecoderService.class);
 
     public Image decodeImage(Image image) throws DecoderException {
         Preconditions.checkNotNull(image, "Image cannot be null");
@@ -31,9 +31,9 @@ public class DecoderServiceImpl implements DecoderService {
         int N = imageBytes.length;
         int M;
 
-        if(imageBytes.length > 0){
+        if (imageBytes.length > 0){
             M = imageBytes[0].length;
-        } else {
+        } else{
             logger.error("Not a valid project binary file!");
             throw new DecoderException("Not a valid project binary file!");
         }
@@ -53,21 +53,18 @@ public class DecoderServiceImpl implements DecoderService {
         while (itr.hasNext()) {
             int b1 = itr.next();
 
-            if(previous == null) {
+            if (previous == null){
                 previous = b1;
-                count.incrementAndGet();
-            }else{
-                if(previous == b1){
-                    count.incrementAndGet();
-                }else{
+            } else{
+                if (previous != b1) {
                     previous = b1;
                     output.append(count.get()).append(" ");
                     count.set(0);
-                    count.incrementAndGet();
                 }
             }
+            count.incrementAndGet();
 
-            if(!itr.hasNext()){
+            if (!itr.hasNext()){
                 output.append(count.get());
             }
         }
@@ -100,10 +97,10 @@ public class DecoderServiceImpl implements DecoderService {
         for (int i = 0; i < numbersIntArray.length; i++) {
 
             int split = numbersIntArray[i];
-            if(i % 2 == 0){
+            if (i % 2 == 0) {
                 //Adds zeros
                 filler = Strings.padEnd(filler, filler.length()+split, '0');
-            }else{
+            } else {
                 //Adds ones
                 filler = Strings.padEnd(filler, filler.length()+split, '1');
 

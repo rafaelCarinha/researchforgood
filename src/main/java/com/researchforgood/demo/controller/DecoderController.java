@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/decoder")
 public class DecoderController {
 
-    DecoderService decoderService;
+    final DecoderService decoderService;
 
     public DecoderController(DecoderService decoderService){
         this.decoderService = decoderService;
