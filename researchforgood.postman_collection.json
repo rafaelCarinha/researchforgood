@@ -50,11 +50,10 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/api/v1/decoder/encode",
+					"raw": "{{host}}/api/v1/decoder/encode",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"v1",
@@ -80,11 +79,10 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/api/v1/decoder/decode",
+					"raw": "{{host}}/api/v1/decoder/decode",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"v1",
@@ -110,11 +108,10 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/api/v1/decoder/decode",
+					"raw": "{{host}}/api/v1/decoder/decode",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"v1",
